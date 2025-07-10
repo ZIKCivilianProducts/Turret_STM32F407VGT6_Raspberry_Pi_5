@@ -9,32 +9,32 @@
 
 void Read_AD_Conversion(Motor *Motor_xx)
 {
-	uint32_t TimeOut = 100;
-
+	// Считывание значений
 	HAL_ADC_Start(Motor_xx->Config.Convertor.Convertor);
-	HAL_ADC_PollForConversion(Motor_xx->Config.Convertor.Convertor, TimeOut);
+	HAL_ADC_PollForConversion(Motor_xx->Config.Convertor.Convertor, 100);
+	unsigned long int raw_value = HAL_ADC_GetValue(Motor_xx->Config.Convertor.Convertor);
+	HAL_ADC_Stop(Motor_xx->Config.Convertor.Convertor);
 
-		uint32_t raw_value = HAL_ADC_GetValue(Motor_xx->Config.Convertor.Convertor);
-		HAL_ADC_Stop(Motor_xx->Config.Convertor.Convertor);
+	// Расчёт частоиспользуемых значений
+	float alfa = Motor_xx->Config.Alfa;
+	float unalfa = 1.0f - alfa;
 
-//		float alfa = Motor_xx->Config.Alfa;
-		float alfa = 0.05f;
-		float one_minus_alfa = 1.0f - alfa;
+	unsigned long int discrete_range = Motor_xx->Config.Convertor.Maximum_discrete_level - Motor_xx->Config.Convertor.Minimum_discrete_level;
+	float angular_range = Motor_xx->Config.Angular.Maximum_angular - Motor_xx->Config.Angular.Minimum_angular;
 
-		float filtered_discrete = alfa * (float)raw_value + one_minus_alfa * Motor_xx->Status.filtered_Discrete_level;
-		Motor_xx->Status.filtered_Discrete_level = filtered_discrete;
+	// Расчёт выходных значений
+	unsigned long int filtered_discrete = (unsigned long int)(alfa * (float)raw_value + unalfa * (float)Motor_xx->Status.filtered_Discrete_level);
+	float norma = (filtered_discrete - (float)Motor_xx->Config.Convertor.Minimum_discrete_level) / (float)discrete_range;
 
-		float discrete_range = (float)(Motor_xx->Config.Convertor.Maximum_discrete_level - Motor_xx->Config.Convertor.Minimum_discrete_level);
-		float angular_range = Motor_xx->Config.Angular.Maximum_angular - Motor_xx->Config.Angular.Minimum_angular;
+	float angular = Motor_xx->Config.Angular.Minimum_angular + norma * angular_range;
+	float filtered_angular = alfa * angular + unalfa * Motor_xx->Status.filter_Angular;
 
-		float norma = (filtered_discrete - (float)Motor_xx->Config.Convertor.Minimum_discrete_level) / discrete_range;
+	// Запись значений
+	Motor_xx->Status.Discrete_level = filtered_discrete;
+	Motor_xx->Status.filtered_Discrete_level = filtered_discrete;
 
-		float angular = Motor_xx->Config.Angular.Minimum_angular + norma * angular_range;
-		float filtered_angular = alfa * angular + one_minus_alfa * Motor_xx->Status.filter_Angular;
-		Motor_xx->Status.filter_Angular = filtered_angular;
-
-		Motor_xx->Status.Discrete_level = filtered_discrete;
-		Motor_xx->Status.Angular = filtered_angular;
+	Motor_xx->Status.Angular = filtered_angular;
+	Motor_xx->Status.filter_Angular = filtered_angular;
 };
 
 void Set_PWM_Frequency(Motor *Motor_xx, uint32_t freq)
@@ -76,28 +76,28 @@ void Start_motor(Motor *Motor_xx, GPIO_PinState roter)
 
 void Up_fequency(Motor *Motor_xx)
 {
-//	if (Motor_xx->Status.Frequency < Motor_xx->Config.PWM.Maximum_frequency)
-//	{
-//		uint32_t freq = Motor_xx->Status.Frequency + Motor_xx->Config.PWM.Increment_frequency;
-//		freq = MIN(freq, Motor_xx->Config.PWM.Maximum_frequency);
-//		Set_PWM_Frequency(Motor_xx, freq);
-//	};
-
-	if (Motor_xx->Status.Frequency < Motor_xx->Config.PWM.Maximum_frequency) Set_PWM_Frequency(Motor_xx, MIN(Motor_xx->Status.Frequency + Motor_xx->Config.PWM.Increment_frequency, Motor_xx->Config.PWM.Maximum_frequency));
+	if (Motor_xx->Status.Frequency < Motor_xx->Config.PWM.Maximum_frequency)
+	{
+		unsigned long int freq = Motor_xx->Status.Frequency + Motor_xx->Config.PWM.Increment_frequency;
+		freq = MIN(freq, Motor_xx->Config.PWM.Maximum_frequency);
+		Set_PWM_Frequency(Motor_xx, freq);
+	};
 };
 
 void Stop_motor(Motor *Motor_xx)
 {
 	Set_PWM_Frequency(Motor_xx, 0);
-	HAL_TIM_PWM_Stop(Motor_xx->Config.PWM.Timer, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Stop(Motor_xx->Config.PWM.Timer, TIM_CHANNEL_1); // Требуется остановка, так как в конце установки частоты таймер запускается
 	Motor_xx->Status.Moving = 0;
 };
 
-void Moving_away_from_borders(Motor *Motor_xx, unsigned int TimeOut, GPIO_PinState roter)
+void Moving_away_from_borders(Motor *Motor_xx, unsigned long int TimeOut, GPIO_PinState roter)
 {
 	Stop_motor(Motor_xx->Config.PWM.Timer == Motor_AZ.Config.PWM.Timer ? &Motor_EL : &Motor_AZ);
+
 	HAL_GPIO_WritePin(Motor_xx->Config.GPIO.DIR_port, Motor_xx->Config.GPIO.DIR_pin, roter);
-	Set_PWM_Frequency(Motor_xx, 3 * Motor_xx->Config.PWM.Minimum_frequency);
-	HAL_Delay(500);
+	Set_PWM_Frequency(Motor_xx, 3000);
+	HAL_Delay(TimeOut);
+
 	Motor_xx->Status.Moving = 0;
 };

@@ -57,13 +57,7 @@ size_t Size_Rx_UART;
 size_t Size_Tx_UART;
 
 float Difference;
-
-
-
-
-
-
-
+/*----------------------------------------------------------------------------*/
 uint32_t freq_az;
 uint32_t freq_el;
 
@@ -73,6 +67,7 @@ char Working_zon_AZ = 10;
 char Working_zon_EL = 10;
 float Angular_AZ = 0.0f;
 float Angular_EL = 0.0f;
+
 uint32_t Level_AZ;
 uint32_t Level_EL;
 /* USER CODE END PV */
@@ -104,7 +99,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  	Size_Rx_UART = sizeof(Target.Rx_data);
+  Size_Rx_UART = sizeof(Target.Rx_data);
 	Size_Tx_UART = sizeof(Target.Tx_data);
 
 	Motor_AZ.Config.PWM.Timer = &htim3; Motor_AZ.Config.Convertor.Convertor = &hadc1;
@@ -141,75 +136,43 @@ int main(void)
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);
-
-//  IMM_Init(Motor_AZ.Status.Angular);
-//  IMM_Init(Motor_EL.Status.Angular);
-
-  // Без PWM пращения происходить не будет, при этом происходит блокировка
-  HAL_GPIO_WritePin(Motor_AZ.Config.GPIO.ENA_port, Motor_AZ.Config.GPIO.ENA_pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(Motor_EL.Config.GPIO.ENA_port, Motor_EL.Config.GPIO.ENA_pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  See_buffer_UART[0] = Target.Rx_data[0];
-	  See_buffer_UART[1] = Target.Rx_data[1];
-	  See_buffer_UART[2] = Target.Rx_data[2];
-	  See_buffer_UART[3] = Target.Rx_data[3];
-	  See_buffer_UART[4] = Target.Rx_data[4];
-	  See_buffer_UART[5] = Target.Rx_data[5];
-	  See_buffer_UART[6] = Target.Rx_data[6];
-	  See_buffer_UART[7] = Target.Rx_data[7];
-	  See_buffer_UART[8] = Target.Rx_data[8];
-	  See_buffer_UART[9] = Target.Rx_data[9];
-	  See_buffer_UART[0] = Target.Rx_data[0];
-	  See_buffer_UART[11] = Target.Rx_data[11];
-	  See_buffer_UART[12] = Target.Rx_data[12];
-	  See_buffer_UART[13] = Target.Rx_data[13];
-	  See_buffer_UART[14] = Target.Rx_data[14];
-	  See_buffer_UART[15] = Target.Rx_data[15];
-	  See_buffer_UART[16] = Target.Rx_data[16];
-	  See_buffer_UART[17] = Target.Rx_data[17];
-	  See_buffer_UART[18] = Target.Rx_data[18];
-	  See_buffer_UART[19] = Target.Rx_data[19];
-	  See_buffer_UART[20] = Target.Rx_data[20];
-
-	  Level_AZ = Motor_AZ.Status.Discrete_level;
-	  Level_EL = Motor_EL.Status.Discrete_level;
-
-	  Angular_AZ = Motor_AZ.Status.Angular;
-	  Angular_EL = Motor_EL.Status.Angular;
-
-	  Working_zon_AZ = Working_area(&Motor_AZ);
-	  Working_zon_EL = Working_area(&Motor_EL);
-
-	  freq_az = Motor_AZ.Status.Frequency;
-	  freq_el = Motor_EL.Status.Frequency;
-
 	  Read_AD_Conversion(&Motor_AZ);
 	  Read_AD_Conversion(&Motor_EL);
 
-//	  switch (Target.Rx_data[15])
-//	  {
-//	  case '0': // Управление_стрелками_(ручной_решим)
-//		  if (Working_area(&Motor_AZ))
-//			  if (Target.Azimuth != 0)
-//				  if (!Motor_AZ.Status.Moving) Start_motor(&Motor_AZ, Target.Azimuth > 0 ? Left : Right);
-//				  else Up_fequency(&Motor_AZ);
-//			  else Stop_motor(&Motor_AZ);
-//		  else Moving_away_from_borders(&Motor_AZ, 1000, Motor_AZ.Status.Angular > 0 ? Right : Left);
-//
-//		  if (Working_area(&Motor_EL))
-//			  if (Target.Elevation != 0)
-//				  if (!Motor_EL.Status.Moving) Start_motor(&Motor_EL, Target.Elevation > 0 ? Up : Down);
-//				  else Up_fequency(&Motor_EL);
-//			  else Stop_motor(&Motor_EL);
-//		  else Moving_away_from_borders(&Motor_EL, 100, Motor_EL.Status.Angular > 0 ? Down : Up);
-//
-//		  if (Target.Rx_data[17] == '0') // Пиф-паф
-//		  break;
+	  switch (Target.Rx_data[15])
+	  {
+	  case '0': // Управление_стрелками_(ручной_решим)
+		  if (Working_area(&Motor_AZ))
+      {
+        if (Target.Azimuth != 0)
+        {
+          if (!Motor_AZ.Status.Moving)
+          {
+            Start_motor(&Motor_AZ, Target.Azimuth > 0 ? Left : Right);
+          }
+				  else
+          {
+            Up_fequency(&Motor_AZ);
+          }
+        }
+			  else
+        {
+          Stop_motor(&Motor_AZ);
+        };
+      }
+		  else
+      {
+        Moving_away_from_borders(&Motor_AZ, 100, Motor_AZ.Status.Angular > 0 ? Right : Left);
+      };
+
+		  if (Target.Rx_data[17] == '0') // Пиф-паф
+		  break;
 
 //	  case '1': // Передача_конечного_угла_(полуавтоматический_режим)
 //		  Difference = Target.Azimuth - Motor_AZ.Status.Angular;
@@ -750,7 +713,6 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-	//HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 100);
 	__disable_irq();
 	while (1)
 	{
