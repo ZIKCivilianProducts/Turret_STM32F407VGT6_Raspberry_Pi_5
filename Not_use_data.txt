@@ -1,0 +1,174 @@
+char See_buffer_UART[21];
+char Mode_work = 10;
+char Working_zon_AZ = 10;
+char Working_zon_EL = 10;
+float Angular_AZ = 0.0f;
+float Angular_EL = 0.0f;
+uint32_t Level_AZ;
+uint32_t Level_EL;
+
+See_buffer_UART[0] = Target.Rx_data[0];
+See_buffer_UART[1] = Target.Rx_data[1];
+See_buffer_UART[2] = Target.Rx_data[2];
+See_buffer_UART[3] = Target.Rx_data[3];
+See_buffer_UART[4] = Target.Rx_data[4];
+See_buffer_UART[5] = Target.Rx_data[5];
+See_buffer_UART[6] = Target.Rx_data[6];
+See_buffer_UART[7] = Target.Rx_data[7];
+See_buffer_UART[8] = Target.Rx_data[8];
+See_buffer_UART[9] = Target.Rx_data[9];
+See_buffer_UART[0] = Target.Rx_data[0];
+See_buffer_UART[11] = Target.Rx_data[11];
+See_buffer_UART[12] = Target.Rx_data[12];
+See_buffer_UART[13] = Target.Rx_data[13];
+See_buffer_UART[14] = Target.Rx_data[14];
+See_buffer_UART[15] = Target.Rx_data[15];
+See_buffer_UART[16] = Target.Rx_data[16];
+See_buffer_UART[17] = Target.Rx_data[17];
+See_buffer_UART[18] = Target.Rx_data[18];
+See_buffer_UART[19] = Target.Rx_data[19];
+See_buffer_UART[20] = Target.Rx_data[20];
+
+Level_AZ = Motor_AZ.Status.Discrete_level;
+Level_EL = Motor_EL.Status.Discrete_level;
+
+Angular_AZ = Motor_AZ.Status.Angular;
+Angular_EL = Motor_EL.Status.Angular;
+
+Working_zon_AZ = Working_area(&Motor_AZ);
+Working_zon_EL = Working_area(&Motor_EL);
+
+
+
+
+
+
+
+
+
+
+
+
+
+char *pointer_az = strstr(Target.Rx_data, "Az");
+char *pointer_el = strstr(Target.Rx_data, "El");
+char *pointer_fm = strstr(Target.Rx_data, "Fm");
+Target.Azimuth_difference =   atof(pointer_az + 2) / 10;
+Target.Elevation_difference = atof(pointer_el + 2) / 10;
+Target.Fire_mode =            atof(pointer_fm + 2);
+
+if(Target.Rx_data[0] == 'A' && Target.Rx_data[1] == 'z' && Target.Rx_data[7] == 'E' && Target.Rx_data[8] == 'l' && Target.Rx_data[14] == 'M' && Target.Rx_data[16] == 'F')
+{};
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Пользовательские библиотеки -------------------------------------------------------------------------*/
+#include "stm32f4xx_hal.h"
+
+/* Системные библиотеки --------------------------------------------------------------------------------*/
+#include <math.h>
+#include <stdio.h>
+#include <stdint.h>
+
+/* Настройки IMM фильтра -------------------------------------------------------------------------------*/
+#define NUM_MODELS 2 // Количество моделей движения:
+/*
+ * +	CV - постоянная угловая скорость
+ * -	CA - постоянное угловое ускорение
+ * +	STOP - резкая остановка
+ * -	TURN - резкая смена направления
+ * */
+#define STATE_DIM 4 // Размерность вектора состояния (входные данные)
+/*
+ * +	θ_az - разница углов азимута
+ * +	θ_el - разница углов угол места
+ * +	w_az - частота импульсов азимута
+ * +	w_el - частота импульсов угла места
+ * */
+#define MEAS_DIM 2 // Размерность вектора измерения (выходные данные)
+/*
+ * +	az - азимут
+ * +	el - угол места
+ * */
+
+/* Состояние системы -----------------------------------------------------------------------------------*/
+typedef struct {
+    double azimuth; // Азимут (рад)
+    double elevation; // Угол места (рад)
+    double azimuth_rate; // Скорость изменения азимута (рад/с)
+    double elevation_rate; // Скорость изменения угла места (рад/с)
+} SystemState;
+
+/* Фильтр Калмана --------------------------------------------------------------------------------------*/
+typedef struct {
+    double F[STATE_DIM][STATE_DIM]; // Матрица перехода состояния
+    double H[MEAS_DIM][STATE_DIM]; // Матрица измерений
+    double Q[STATE_DIM][STATE_DIM]; // Матрица шума процесса
+    double R[MEAS_DIM][MEAS_DIM]; // Матрица шума измерений
+    double x[STATE_DIM]; // Текущая оценка состояния
+    double P[STATE_DIM][STATE_DIM]; // Ковариационная матрица ошибки
+} KalmanFilter;
+
+/* IMM -------------------------------------------------------------------------------------------------*/
+typedef struct {
+    KalmanFilter filters[NUM_MODELS]; // Массив фильтров Калмана
+    double model_probs[NUM_MODELS]; // Вероятности моделей
+    double transition[NUM_MODELS][NUM_MODELS]; // Матрица переходов
+} IMMFilter;
+
+/* Прототипы функций -----------------------------------------------------------------------------------*/
+// Инициализация фильтра Калмана для заданной модели
+void init_kalman_filter(KalmanFilter *kf, const double F[STATE_DIM][STATE_DIM], 
+                        const double H[MEAS_DIM][STATE_DIM], 
+                        const double Q[STATE_DIM][STATE_DIM], 
+                        const double R[MEAS_DIM][MEAS_DIM],
+                        const SystemState *initial_state);
+
+// Инициализация IMM
+void init_imm_filter(IMMFilter *imm, const SystemState *initial_state);
+
+// Предсказание состояния в фильтре Калмана
+void kalman_predict(KalmanFilter *kf);
+
+// Коррекция состояния в фильтре Калмана по измерению
+void kalman_update(KalmanFilter *kf, const double z[MEAS_DIM]);
+
+// Шаг взаимодействия (mixing) в IMM
+void imm_mixing(IMMFilter *imm, double mixed_states[NUM_MODELS][STATE_DIM], 
+                double mixed_covs[NUM_MODELS][STATE_DIM][STATE_DIM]);
+
+// Фильтрация (обновление моделей) в IMM
+void imm_filtering(IMMFilter *imm, const double z[MEAS_DIM], 
+                   double updated_states[NUM_MODELS][STATE_DIM],
+                   double updated_covs[NUM_MODELS][STATE_DIM][STATE_DIM],
+                   double likelihoods[NUM_MODELS]);
+
+// Обновление вероятностей моделей в IMM
+void imm_update_probs(IMMFilter *imm, const double likelihoods[NUM_MODELS]);
+
+// Объединение оценок моделей в IMM
+void imm_combine_estimates(const IMMFilter *imm, 
+                          const double updated_states[NUM_MODELS][STATE_DIM],
+                          const double updated_covs[NUM_MODELS][STATE_DIM][STATE_DIM],
+                          SystemState *combined_state,
+                          double combined_cov[STATE_DIM][STATE_DIM]);
+
+// Основной шаг IMM
+void imm_step(IMMFilter *imm, const double z[MEAS_DIM], 
+              SystemState *combined_state, double combined_cov[STATE_DIM][STATE_DIM]);
+
+// Преобразование углов в радианы
+double deg2rad(double deg);
+
+// Преобразование радиан в градусы
+double rad2deg(double rad);

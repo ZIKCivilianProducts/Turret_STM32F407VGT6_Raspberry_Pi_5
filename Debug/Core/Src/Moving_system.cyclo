@@ -1,0 +1,7 @@
+../Core/Src/Moving_system.c:10:6:Read_AD_Conversion	1
+../Core/Src/Moving_system.c:40:6:Set_PWM_Frequency	2
+../Core/Src/Moving_system.c:60:6:Working_area	3
+../Core/Src/Moving_system.c:70:6:Start_motor	1
+../Core/Src/Moving_system.c:77:6:Up_fequency	2
+../Core/Src/Moving_system.c:89:6:Stop_motor	1
+../Core/Src/Moving_system.c:96:6:Moving_away_from_borders	2
