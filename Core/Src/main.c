@@ -54,22 +54,8 @@ UART_HandleTypeDef huart2;
 volatile unsigned char UART_ready = 1;
 
 size_t Size_Rx_UART;
-size_t Size_Tx_UART;
 
 float Difference;
-/*----------------------------------------------------------------------------*/
-uint32_t freq_az;
-uint32_t freq_el;
-
-char See_buffer_UART[21];
-char Mode_work = 10;
-char Working_zon_AZ = 10;
-char Working_zon_EL = 10;
-float Angular_AZ = 0.0f;
-float Angular_EL = 0.0f;
-
-uint32_t Level_AZ;
-uint32_t Level_EL;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,13 +86,9 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
   Size_Rx_UART = sizeof(Target.Rx_data);
-	Size_Tx_UART = sizeof(Target.Tx_data);
 
-	Motor_AZ.Config.PWM.Timer = &htim3; Motor_AZ.Config.Convertor.Convertor = &hadc1;
-	Motor_EL.Config.PWM.Timer = &htim2; Motor_EL.Config.Convertor.Convertor = &hadc2;
-
-	PID_AZ.last_time = HAL_GetTick();
-	PID_EL.last_time = HAL_GetTick();
+  Motor_AZ.Config.PWM.Timer = &htim3; ADC_AZ.Convertor = &hadc1;
+  Motor_EL.Config.PWM.Timer = &htim2; ADC_EL.Convertor = &hadc2;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -140,102 +122,78 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  /**
+    * @brief Main motor control loop with mode selection and safety management
+    *
+    * @details
+    * This infinite loop implements the core control logic:
+    *
+    * 1. Performs continuous ADC conversions for both motors (AZ/EL)
+    * 2. Checks working area safety for both motors
+    * 3. Operates in two distinct regimes:
+    *
+    *    Safe Mode (both motors in working area):
+    *    - Selects control mode based on Target.Rx_data[15]:
+    *      * '0': First_mode - basic position control
+    *      * '1': Second_mode - advanced position control
+    *      * Default: Data transfer to Raspberry Pi
+    *
+    *    Safety Mode (any motor out of bounds):
+    *    - Immediately disables both motors
+    *    - After 500ms delay, initiates border recovery:
+    *      * Moves offending motor in opposite direction
+    *
+    * @note Uses 500ms safety delay before border recovery
+    * @note Automatically selects recovery direction based on current position
+    * @note Implements complete motor shutdown when boundaries are violated
+    *
+    * @warning Right/Left/Up/Down directions must be properly #defined
+    * @warning Safety delay (500ms) is critical for system protection
+    * @note Motor recovery only attempted for the offending axis
+    *
+    * @param[in] Target Contains control commands and setpoints
+    * @param[in,out] Motor_AZ Azimuth motor control structure
+    * @param[in,out] Motor_EL Elevation motor control structure
+    */
   while (1)
   {
-	  Read_AD_Conversion(&Motor_AZ);
-	  Read_AD_Conversion(&Motor_EL);
+    Read_AD_Conversion(&ADC_AZ, &Motor_AZ);
+    Read_AD_Conversion(&ADC_EL, &Motor_EL);
 
-	  switch (Target.Rx_data[15])
-	  {
-	  case '0': // Управление_стрелками_(ручной_решим)
-		  if (Working_area(&Motor_AZ))
+    char Working_zon_az = Working_area(&Motor_AZ);
+    char Working_zon_el = Working_area(&Motor_EL);
+
+    if (Working_zon_az && Working_zon_el)
+    {
+      switch (Target.Rx_data[15])
       {
-        if (Target.Azimuth != 0)
-        {
-          if (!Motor_AZ.Status.Moving)
-          {
-            Start_motor(&Motor_AZ, Target.Azimuth > 0 ? Left : Right);
-          }
-				  else
-          {
-            Up_fequency(&Motor_AZ);
-          }
-        }
-			  else
-        {
-          Stop_motor(&Motor_AZ);
-        };
-      }
-		  else
-      {
-        Moving_away_from_borders(&Motor_AZ, 100, Motor_AZ.Status.Angular > 0 ? Right : Left);
+        case '0':
+          First_mode(&Motor_AZ, Target.Azimuth);
+          First_mode(&Motor_EL, Target.Elevation);
+    	  break;
+        case '1':
+          Second_mode(Target.Azimuth, &Motor_AZ);
+          Second_mode(Target.Elevation, &Motor_EL);
+          break;
+        case '2':
+          // Проваливается в default
+        default:
+          Transfer_to_raspberry_pi(&huart2, &Target, &Motor_AZ, &Motor_EL);
+          break;
       };
+    }
+    else
+    {
+      HAL_GPIO_WritePin(Motor_AZ.Config.GPIO.ENA_port, Motor_AZ.Config.GPIO.ENA_pin, Sleep);
+      Motor_AZ.Status.Moving = 0;
+      HAL_GPIO_WritePin(Motor_EL.Config.GPIO.ENA_port, Motor_EL.Config.GPIO.ENA_pin, Sleep);
+      Motor_EL.Status.Moving = 0;
 
-		  if (Target.Rx_data[17] == '0') // Пиф-паф
-		  break;
+      HAL_Delay(500);
 
-//	  case '1': // Передача_конечного_угла_(полуавтоматический_режим)
-//		  Difference = Target.Azimuth - Motor_AZ.Status.Angular;
-//		  if (Working_area(&Motor_AZ))
-//			  if (fabsf(Difference) > Motor_AZ.Config.Angular.Guidance_accuracy)
-//				  if (!Motor_AZ.Status.Moving) Start_motor(&Motor_AZ, Difference > 0 ? Left : Right);
-//				  else Up_fequency(&Motor_AZ);
-//			  else Stop_motor(&Motor_AZ);
-//		  else Moving_away_from_borders(&Motor_AZ, 100, Motor_AZ.Status.Angular > 0 ? Right : Left);
-//
-//		  Difference = Target.Elevation - Motor_EL.Status.Angular;
-//		  if (Working_area(&Motor_EL))
-//			  if (fabsf(Difference) > Motor_EL.Config.Angular.Guidance_accuracy)
-//				  if (!Motor_EL.Status.Moving) Start_motor(&Motor_EL, Difference > 0 ? Up : Down);
-//				  else Up_fequency(&Motor_EL);
-//			  else Stop_motor(&Motor_EL);
-//		  else Moving_away_from_borders(&Motor_EL, 10, Motor_EL.Status.Angular > 0 ? Down : Up);
-//
-//		  if (Target.Rx_data[17] == '0') // Пиф-паф
-//		  break;
-//
-//	  case '2': // Передача_разности_углов_(автономный_режим)
-//		  Difference = Target.Azimuth;
-//		  if (Working_area(&Motor_AZ))
-//			  if (fabsf(Difference) > Motor_AZ.Config.Angular.Guidance_accuracy)
-//				  if (!Motor_AZ.Status.Moving) Start_motor(&Motor_AZ, Difference > 0 ? Left : Right);
-//				  else Up_fequency(&Motor_AZ);
-//			  else Stop_motor(&Motor_AZ);
-//		  else Moving_away_from_borders(&Motor_AZ, 100, Motor_AZ.Status.Angular > 0 ? Right : Left);
-//
-//		  Difference = Target.Elevation;
-//		  if (Working_area(&Motor_EL))
-//			  if (fabsf(Difference) > Motor_EL.Config.Angular.Guidance_accuracy)
-//				  if (!Motor_EL.Status.Moving) Start_motor(&Motor_EL, Difference > 0 ? Up : Down);
-//				  else Up_fequency(&Motor_EL);
-//			  else Stop_motor(&Motor_EL);
-//		  else Moving_away_from_borders(&Motor_EL, 10, Motor_EL.Status.Angular > 0 ? Down : Up);
-//
-//		  if (Target.Rx_data[17] == '0') // Пиф-паф
-//		  // break;
-//		  // Выполнение должно проволиться в default
-//	  default: // Отправка_данных_компьютеру
-//		  if (!Target.transmitting)
-//		  {
-//			  uint16_t angular_az = (uint16_t)fabs(Motor_AZ.Status.Angular * 10);
-//			  uint16_t angular_el = (uint16_t)fabs(Motor_EL.Status.Angular * 10);
-//
-//			  Target.Tx_data[1] = (Motor_AZ.Status.Angular >= 0) ? '1' : '0';
-//			  Target.Tx_data[2] = '0' + (angular_az / 1000) % 10;
-//			  Target.Tx_data[3] = '0' + (angular_az / 100) % 10;
-//			  Target.Tx_data[4] = '0' + (angular_az / 10) % 10;
-//			  Target.Tx_data[5] = '0' + (angular_az) % 10;
-//
-//			  Target.Tx_data[6] = (Motor_EL.Status.Angular >= 0) ? '1' : '0';
-//			  Target.Tx_data[7] = '0' +  (angular_el / 1000) % 10;
-//			  Target.Tx_data[8] = '0' +  (angular_el / 100) % 10;
-//			  Target.Tx_data[9] = '0' +  (angular_el / 10) % 10;
-//			  Target.Tx_data[10] = '0' + (angular_el) % 10;
-//
-//			  if (HAL_UART_Transmit_IT(&huart2, (uint8_t*)Target.Tx_data, Size_Tx_UART) == HAL_OK) Target.transmitting = 1;
-//		  };
-//		  break;
-//	  };
+      if (!Working_zon_az) Moving_away_from_borders(&Motor_AZ, Motor_AZ.Status.Angular > 0 ? Right : Left);
+      else Moving_away_from_borders(&Motor_EL, Motor_EL.Status.Angular > 0 ? Down : Up);
+    };
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -690,10 +648,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	Target.Rx_data[Size_Rx_UART - 1] = '\0';
 
-	Target.Azimuth =   (Target.Rx_data[3]  - '0') * 100.0f + (Target.Rx_data[4]  - '0') * 10.0f + (Target.Rx_data[5]  - '0') + (Target.Rx_data[6]  - '0') * 0.1f;
+	Target.Azimuth =   (Target.Rx_data[3]  - '0') * 100.0f +
+			(Target.Rx_data[4]  - '0') * 10.0f +
+			(Target.Rx_data[5]  - '0') +
+			(Target.Rx_data[6]  - '0') * 0.1f;
 	if (Target.Rx_data[2] == '-') Target.Azimuth = -Target.Azimuth;
 
-	Target.Elevation = (Target.Rx_data[10] - '0') * 100.0f + (Target.Rx_data[11] - '0') * 10.0f + (Target.Rx_data[12] - '0') + (Target.Rx_data[13] - '0') * 0.1f;
+	Target.Elevation = (Target.Rx_data[10] - '0') * 100.0f +
+			(Target.Rx_data[11] - '0') * 10.0f +
+			(Target.Rx_data[12] - '0') +
+			(Target.Rx_data[13] - '0') * 0.1f;
 	if (Target.Rx_data[9] == '-') Target.Elevation = -Target.Elevation;
 
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);

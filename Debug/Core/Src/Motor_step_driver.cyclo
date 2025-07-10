@@ -1,0 +1,8 @@
+../Core/Src/Motor_step_driver.c:87:6:First_mode	3
+../Core/Src/Motor_step_driver.c:128:6:Moving_away_from_borders	1
+../Core/Src/Motor_step_driver.c:165:6:Second_mode	4
+../Core/Src/Motor_step_driver.c:207:6:Set_PWM_frequency	2
+../Core/Src/Motor_step_driver.c:243:6:Start_motor	1
+../Core/Src/Motor_step_driver.c:267:6:Stop_motor	1
+../Core/Src/Motor_step_driver.c:290:6:Up_fequency	2
+../Core/Src/Motor_step_driver.c:319:6:Working_area	3

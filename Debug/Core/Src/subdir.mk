@@ -1,16 +1,14 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (12.3.rel1)
+# Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/Src/Encoder.c \
-../Core/Src/IMM.c \
-../Core/Src/Moving_system.c \
-../Core/Src/PID.c \
-../Core/Src/Structur_Raspberry_Pi.c \
-../Core/Src/Structur_STM.c \
+../Core/Src/Analog_digital_converter.c \
+../Core/Src/Motor_step_driver.c \
+../Core/Src/Raspberry_Pi.c \
+../Core/Src/Transfer_to_Raspberry_Pi.c \
 ../Core/Src/main.c \
 ../Core/Src/stm32f4xx_hal_msp.c \
 ../Core/Src/stm32f4xx_it.c \
@@ -19,12 +17,10 @@ C_SRCS += \
 ../Core/Src/system_stm32f4xx.c 
 
 OBJS += \
-./Core/Src/Encoder.o \
-./Core/Src/IMM.o \
-./Core/Src/Moving_system.o \
-./Core/Src/PID.o \
-./Core/Src/Structur_Raspberry_Pi.o \
-./Core/Src/Structur_STM.o \
+./Core/Src/Analog_digital_converter.o \
+./Core/Src/Motor_step_driver.o \
+./Core/Src/Raspberry_Pi.o \
+./Core/Src/Transfer_to_Raspberry_Pi.o \
 ./Core/Src/main.o \
 ./Core/Src/stm32f4xx_hal_msp.o \
 ./Core/Src/stm32f4xx_it.o \
@@ -33,12 +29,10 @@ OBJS += \
 ./Core/Src/system_stm32f4xx.o 
 
 C_DEPS += \
-./Core/Src/Encoder.d \
-./Core/Src/IMM.d \
-./Core/Src/Moving_system.d \
-./Core/Src/PID.d \
-./Core/Src/Structur_Raspberry_Pi.d \
-./Core/Src/Structur_STM.d \
+./Core/Src/Analog_digital_converter.d \
+./Core/Src/Motor_step_driver.d \
+./Core/Src/Raspberry_Pi.d \
+./Core/Src/Transfer_to_Raspberry_Pi.d \
 ./Core/Src/main.d \
 ./Core/Src/stm32f4xx_hal_msp.d \
 ./Core/Src/stm32f4xx_it.d \
@@ -54,7 +48,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/Encoder.cyclo ./Core/Src/Encoder.d ./Core/Src/Encoder.o ./Core/Src/Encoder.su ./Core/Src/IMM.cyclo ./Core/Src/IMM.d ./Core/Src/IMM.o ./Core/Src/IMM.su ./Core/Src/Moving_system.cyclo ./Core/Src/Moving_system.d ./Core/Src/Moving_system.o ./Core/Src/Moving_system.su ./Core/Src/PID.cyclo ./Core/Src/PID.d ./Core/Src/PID.o ./Core/Src/PID.su ./Core/Src/Structur_Raspberry_Pi.cyclo ./Core/Src/Structur_Raspberry_Pi.d ./Core/Src/Structur_Raspberry_Pi.o ./Core/Src/Structur_Raspberry_Pi.su ./Core/Src/Structur_STM.cyclo ./Core/Src/Structur_STM.d ./Core/Src/Structur_STM.o ./Core/Src/Structur_STM.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su
+	-$(RM) ./Core/Src/Analog_digital_converter.cyclo ./Core/Src/Analog_digital_converter.d ./Core/Src/Analog_digital_converter.o ./Core/Src/Analog_digital_converter.su ./Core/Src/Motor_step_driver.cyclo ./Core/Src/Motor_step_driver.d ./Core/Src/Motor_step_driver.o ./Core/Src/Motor_step_driver.su ./Core/Src/Raspberry_Pi.cyclo ./Core/Src/Raspberry_Pi.d ./Core/Src/Raspberry_Pi.o ./Core/Src/Raspberry_Pi.su ./Core/Src/Transfer_to_Raspberry_Pi.cyclo ./Core/Src/Transfer_to_Raspberry_Pi.d ./Core/Src/Transfer_to_Raspberry_Pi.o ./Core/Src/Transfer_to_Raspberry_Pi.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su
 
 .PHONY: clean-Core-2f-Src
 
