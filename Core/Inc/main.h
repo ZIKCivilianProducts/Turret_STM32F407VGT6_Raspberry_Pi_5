@@ -36,12 +36,11 @@ extern "C" {
 #include <math.h>
 #include <stdbool.h>
 
-#include "IMM.h"
-#include "Moving_system.h"
-#include "Structur_Raspberry_Pi.h"
-#include "Structur_STM.h"
-#include "Encoder.h"
-#include "PID.h"
+#include <Raspberry_Pi.h>
+#include <Motor_step_driver.h>
+#include "Engine_conditions.h"
+#include "Analog_digital_converter.h"
+#include "Transfer_to_Raspberry_Pi.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

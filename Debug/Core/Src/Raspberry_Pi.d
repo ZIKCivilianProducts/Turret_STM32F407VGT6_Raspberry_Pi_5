@@ -1,5 +1,5 @@
-Core/Src/Structur_STM.o: ../Core/Src/Structur_STM.c \
- ../Core/Inc/Structur_STM.h \
+Core/Src/Raspberry_Pi.o: ../Core/Src/Raspberry_Pi.c \
+ ../Core/Inc/Raspberry_Pi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -31,7 +31,7 @@ Core/Src/Structur_STM.o: ../Core/Src/Structur_STM.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-../Core/Inc/Structur_STM.h:
+../Core/Inc/Raspberry_Pi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
