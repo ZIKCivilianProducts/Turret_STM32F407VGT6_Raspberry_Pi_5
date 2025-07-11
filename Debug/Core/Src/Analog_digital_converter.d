@@ -32,8 +32,7 @@ Core/Src/Analog_digital_converter.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/Motor_step_driver.h ../Core/Inc/Engine_conditions.h \
- ../Core/Inc/Binary_macros.h
+ ../Core/Inc/Engine_conditions.h ../Core/Inc/Binary_macros.h
 ../Core/Inc/Analog_digital_converter.h:
 ../Core/Inc/Motor_step_driver.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -67,6 +66,5 @@ Core/Src/Analog_digital_converter.o: \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/Motor_step_driver.h:
 ../Core/Inc/Engine_conditions.h:
 ../Core/Inc/Binary_macros.h:

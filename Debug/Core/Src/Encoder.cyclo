@@ -1,0 +1,2 @@
+../Core/Src/Encoder.c:24:6:Encoders_Init	1
+../Core/Src/Encoder.c:32:7:GetEncoderAngle	5

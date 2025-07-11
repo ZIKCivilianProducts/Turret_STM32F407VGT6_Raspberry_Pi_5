@@ -1,4 +1,5 @@
 "./Core/Src/Analog_digital_converter.o"
+"./Core/Src/Encoder.o"
 "./Core/Src/Motor_step_driver.o"
 "./Core/Src/Raspberry_Pi.o"
 "./Core/Src/Transfer_to_Raspberry_Pi.o"

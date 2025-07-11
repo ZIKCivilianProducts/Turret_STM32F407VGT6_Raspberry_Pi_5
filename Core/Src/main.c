@@ -118,6 +118,7 @@ int main(void)
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);
+  Encoders_Init(&htim5, &htim4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -666,6 +667,34 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     Target.transmitting = 0;  // Сброс флага после передачи
+}
+
+// Обработчик прерывания для азимута (TIM5)
+void TIM5_IRQHandler(void) {
+    if (__HAL_TIM_GET_FLAG(&htim5, TIM_FLAG_UPDATE)) {
+        __HAL_TIM_CLEAR_FLAG(&htim5, TIM_FLAG_UPDATE);
+
+        if (__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim5)) {
+        	Encoder_AZ.total_counts -= 4294967295;
+        } else {
+        	Encoder_AZ.total_counts += 4294967295;
+        }
+    }
+    HAL_TIM_IRQHandler(&htim5);
+}
+
+// Обработчик прерывания для угла места (TIM4)
+void TIM4_IRQHandler(void) {
+    if (__HAL_TIM_GET_FLAG(&htim4, TIM_FLAG_UPDATE)) {
+        __HAL_TIM_CLEAR_FLAG(&htim4, TIM_FLAG_UPDATE);
+
+        if (__HAL_TIM_IS_TIM_COUNTING_DOWN(&htim4)) {
+        	Encoder_EL.total_counts -= 65536;
+        } else {
+        	Encoder_EL.total_counts += 65536;
+        }
+    }
+    HAL_TIM_IRQHandler(&htim4);
 }
 /* USER CODE END 4 */
 

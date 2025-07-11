@@ -1,4 +1,4 @@
-Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
+Core/Src/Encoder.o: ../Core/Src/Encoder.c ../Core/Inc/Encoder.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -30,13 +30,8 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/Raspberry_Pi.h ../Core/Inc/Motor_step_driver.h \
- ../Core/Inc/Engine_conditions.h ../Core/Inc/Binary_macros.h \
- ../Core/Inc/Analog_digital_converter.h \
- ../Core/Inc/Transfer_to_Raspberry_Pi.h ../Core/Inc/Motor_step_driver.h \
- ../Core/Inc/Raspberry_Pi.h ../Core/Inc/Encoder.h \
- ../Core/Inc/Ternary_macros.h ../Core/Inc/stm32f4xx_it.h
-../Core/Inc/main.h:
+ ../Core/Inc/Ternary_macros.h ../Core/Inc/Binary_macros.h
+../Core/Inc/Encoder.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
@@ -68,14 +63,5 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/Raspberry_Pi.h:
-../Core/Inc/Motor_step_driver.h:
-../Core/Inc/Engine_conditions.h:
-../Core/Inc/Binary_macros.h:
-../Core/Inc/Analog_digital_converter.h:
-../Core/Inc/Transfer_to_Raspberry_Pi.h:
-../Core/Inc/Motor_step_driver.h:
-../Core/Inc/Raspberry_Pi.h:
-../Core/Inc/Encoder.h:
 ../Core/Inc/Ternary_macros.h:
-../Core/Inc/stm32f4xx_it.h:
+../Core/Inc/Binary_macros.h:
