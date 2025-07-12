@@ -51,11 +51,9 @@ TIM_HandleTypeDef htim5;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-volatile unsigned char UART_ready = 1;
-
+unsigned char UART_ready = 1;
 size_t Size_Rx_UART;
-
-float Difference;
+size_t Size_Tx_UART;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,10 +83,17 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  Size_Rx_UART = sizeof(Target.Rx_data);
+  Positional_encoder_AZ.Timer = &htim5;
+  Positional_encoder_EL.Timer = &htim4;
 
-  Motor_AZ.Config.PWM.Timer = &htim3; ADC_AZ.Convertor = &hadc1;
-  Motor_EL.Config.PWM.Timer = &htim2; ADC_EL.Convertor = &hadc2;
+  Motor_AZ.PWM.Timer = &htim3;
+  Motor_AZ.PWM.Channel = TIM_CHANNEL_1;
+  Motor_EL.PWM.Timer = &htim2;
+  Motor_EL.PWM.Channel = TIM_CHANNEL_1;
+
+  Target.Chanal = &huart2;
+  Size_Rx_UART = sizeof(Target.Rx_data);
+  Size_Tx_UART = sizeof(Target.Tx_data);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -117,83 +122,35 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);
+  Initialization_of_positioning_encoders();
+  HAL_UART_Receive_IT(Target.Chanal, (uint8_t*)Target.Rx_data, Size_Rx_UART);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  /**
-    * @brief Main motor control loop with mode selection and safety management
-    *
-    * @details
-    * This infinite loop implements the core control logic:
-    *
-    * 1. Performs continuous ADC conversions for both motors (AZ/EL)
-    * 2. Checks working area safety for both motors
-    * 3. Operates in two distinct regimes:
-    *
-    *    Safe Mode (both motors in working area):
-    *    - Selects control mode based on Target.Rx_data[15]:
-    *      * '0': First_mode - basic position control
-    *      * '1': Second_mode - advanced position control
-    *      * Default: Data transfer to Raspberry Pi
-    *
-    *    Safety Mode (any motor out of bounds):
-    *    - Immediately disables both motors
-    *    - After 500ms delay, initiates border recovery:
-    *      * Moves offending motor in opposite direction
-    *
-    * @note Uses 500ms safety delay before border recovery
-    * @note Automatically selects recovery direction based on current position
-    * @note Implements complete motor shutdown when boundaries are violated
-    *
-    * @warning Right/Left/Up/Down directions must be properly #defined
-    * @warning Safety delay (500ms) is critical for system protection
-    * @note Motor recovery only attempted for the offending axis
-    *
-    * @param[in] Target Contains control commands and setpoints
-    * @param[in,out] Motor_AZ Azimuth motor control structure
-    * @param[in,out] Motor_EL Elevation motor control structure
-    */
   while (1)
   {
-    Read_AD_Conversion(&ADC_AZ, &Motor_AZ);
-    Read_AD_Conversion(&ADC_EL, &Motor_EL);
+    Reading_the_system_position(&Positional_encoder_AZ, &Systema_AZ);
+    Reading_the_system_position(&Positional_encoder_EL, &Systema_EL);
 
-    char Working_zon_az = Working_area(&Motor_AZ);
-    char Working_zon_el = Working_area(&Motor_EL);
-
-    if (Working_zon_az && Working_zon_el)
-    {
-      switch (Target.Rx_data[15])
-      {
-        case '0':
-          First_mode(&Motor_AZ, Target.Azimuth);
-          First_mode(&Motor_EL, Target.Elevation);
-    	  break;
-        case '1':
-          Second_mode(Target.Azimuth, &Motor_AZ);
-          Second_mode(Target.Elevation, &Motor_EL);
-          break;
-        case '2':
-          // Проваливается в default
-        default:
-          Transfer_to_raspberry_pi(&huart2, &Target, &Motor_AZ, &Motor_EL);
-          break;
-      };
+    if (Checking_the_workspace(&Systema_AZ) == HAL_OK && Checking_the_workspace(&Systema_EL) == HAL_OK) {
+      switch (Target.Rx_data[15]) {
+      case '0':
+        Manual_operation();
+    	break;
+      case '1':
+    	Pointing_at_an_angle();
+        break;
+      case '2': break;
+      default:
+    	Message_formation();
+        if (HAL_UART_Transmit_IT(Target.Chanal, (uint8_t*)Target.Tx_data, Size_Tx_UART) == HAL_OK) {
+          Target.transmitting = 1;
+        };
+        break;
+      }
     }
-    else
-    {
-      HAL_GPIO_WritePin(Motor_AZ.Config.GPIO.ENA_port, Motor_AZ.Config.GPIO.ENA_pin, Sleep);
-      Motor_AZ.Status.Moving = 0;
-      HAL_GPIO_WritePin(Motor_EL.Config.GPIO.ENA_port, Motor_EL.Config.GPIO.ENA_pin, Sleep);
-      Motor_EL.Status.Moving = 0;
-
-      HAL_Delay(500);
-
-      if (!Working_zon_az) Moving_away_from_borders(&Motor_AZ, Motor_AZ.Status.Angular > 0 ? Right : Left);
-      else Moving_away_from_borders(&Motor_EL, Motor_EL.Status.Angular > 0 ? Down : Up);
-    };
+    else {Return_to_the_workspace();};
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -646,26 +603,14 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	Target.Rx_data[Size_Rx_UART - 1] = '\0';
-
-	Target.Azimuth =   (Target.Rx_data[3]  - '0') * 100.0f +
-			(Target.Rx_data[4]  - '0') * 10.0f +
-			(Target.Rx_data[5]  - '0') +
-			(Target.Rx_data[6]  - '0') * 0.1f;
-	if (Target.Rx_data[2] == '-') Target.Azimuth = -Target.Azimuth;
-
-	Target.Elevation = (Target.Rx_data[10] - '0') * 100.0f +
-			(Target.Rx_data[11] - '0') * 10.0f +
-			(Target.Rx_data[12] - '0') +
-			(Target.Rx_data[13] - '0') * 0.1f;
-	if (Target.Rx_data[9] == '-') Target.Elevation = -Target.Elevation;
+	Data_parsing();
 
 	HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);
 };
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    Target.transmitting = 0;  // Сброс флага после передачи
+    Target.transmitting = 0;
 }
 /* USER CODE END 4 */
 

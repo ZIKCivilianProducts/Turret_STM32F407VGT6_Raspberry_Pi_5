@@ -1,5 +1,4 @@
-Core/Src/Raspberry_Pi.o: ../Core/Src/Raspberry_Pi.c \
- ../Core/Inc/Raspberry_Pi.h \
+Core/Src/Encoder.o: ../Core/Src/Encoder.c ../Core/Inc/Encoder.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -33,7 +32,7 @@ Core/Src/Raspberry_Pi.o: ../Core/Src/Raspberry_Pi.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/Orientation_of_the_system.h ../Core/Inc/Ternary_macros.h \
  ../Core/Inc/Binary_macros.h
-../Core/Inc/Raspberry_Pi.h:
+../Core/Inc/Encoder.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
