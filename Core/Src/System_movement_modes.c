@@ -73,14 +73,14 @@ void Manual_operation(void) {
   */
 void Pointing_at_an_angle(void) {
   float angle_difference_az = Systema_AZ.Status.Angular - Target.Azimuth;
-  if (angle_difference_az > Systema_AZ.Settings.Minimum_angular) {
+  if (fabs(angle_difference_az) > Systema_AZ.Settings.Aiming_accuracy) {
     if (!Systema_AZ.Status.Moving) {Turning_on_the_engine(&Motor_AZ, angle_difference_az > 0 ? Left : Right);}
 	else {Increasing_the_pulse_frequency(&Motor_AZ);};
   }
   else {Engine_shutdown(&Motor_AZ);};
 
   float angle_difference_el = Systema_EL.Status.Angular - Target.Elevation;
-  if (angle_difference_el > Systema_EL.Settings.Minimum_angular) {
+  if (fabs(angle_difference_el) > Systema_EL.Settings.Aiming_accuracy) {
     if (!Systema_EL.Status.Moving) {Turning_on_the_engine(&Motor_EL, angle_difference_el > 0 ? Up : Down);}
   	else {Increasing_the_pulse_frequency(&Motor_EL);};
   }

@@ -12,7 +12,7 @@ Target_data Target =
   .Azimuth = 0,
   .Elevation = 0,
   .Fire_mode = 0,
-  .Rx_data = "Az+0000El-0000M0Fm\r\n\0",
+  .Rx_data = "Az+0000El-0000M0F0\r\n\0",
   .Tx_data = "T0000000000\r\n",
   .transmitting = 0
 };

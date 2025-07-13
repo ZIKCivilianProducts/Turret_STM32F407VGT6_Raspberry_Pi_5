@@ -1,5 +1,5 @@
 ../Core/Src/Motor_step_driver.c:63:6:Setting_the_pulse_frequency	3
-../Core/Src/Motor_step_driver.c:111:6:Turning_on_the_engine	1
-../Core/Src/Motor_step_driver.c:141:6:Engine_shutdown	2
-../Core/Src/Motor_step_driver.c:175:6:Return_to_the_workspace	2
-../Core/Src/Motor_step_driver.c:217:6:Increasing_the_pulse_frequency	4
+../Core/Src/Motor_step_driver.c:111:6:Turning_on_the_engine	2
+../Core/Src/Motor_step_driver.c:143:6:Engine_shutdown	2
+../Core/Src/Motor_step_driver.c:177:6:Return_to_the_workspace	5
+../Core/Src/Motor_step_driver.c:221:6:Increasing_the_pulse_frequency	4

@@ -112,6 +112,8 @@ void Turning_on_the_engine(Motor *Motor_xx, GPIO_PinState direction_of_rotation)
   Setting_the_pulse_frequency(Motor_xx, Motor_xx->PWM.Minimum_frequency);
   HAL_GPIO_WritePin(Motor_xx->Pins.DIR_port, Motor_xx->Pins.DIR_pin, direction_of_rotation);
   HAL_GPIO_WritePin(Motor_xx->Pins.ENA_port, Motor_xx->Pins.ENA_pin, Work);
+  if (Motor_xx == &Motor_AZ) {Systema_AZ.Status.Moving = 1;}
+  else {Systema_EL.Status.Moving = 1;};
 };
 
 /**
@@ -178,15 +180,17 @@ void Return_to_the_workspace(void) {
   HAL_GPIO_WritePin(Motor_EL.Pins.ENA_port, Motor_EL.Pins.ENA_pin, Sleep);
   Systema_EL.Status.Moving = 0;
 
-  if (Checking_the_workspace(&Systema_AZ) == HAL_OK) {
-    Turning_on_the_engine(&Motor_AZ, Systema_AZ.Status.Angular > 0 ? Right : Left);
-    HAL_Delay(500);
-    Engine_shutdown(&Motor_AZ);
-  }
-  else {
-    Turning_on_the_engine(&Motor_EL, Systema_EL.Status.Angular > 0 ? Down : Up);
-    HAL_Delay(500);
-    Engine_shutdown(&Motor_EL);
+  while (Checking_the_workspace(&Systema_AZ) != HAL_OK || Checking_the_workspace(&Systema_EL) != HAL_OK) {
+    if (Checking_the_workspace(&Systema_AZ) == HAL_OK) {
+      Turning_on_the_engine(&Motor_AZ, Systema_AZ.Status.Angular > 0 ? Right : Left);
+      HAL_Delay(250);
+      Engine_shutdown(&Motor_AZ);
+    };
+    if (Checking_the_workspace(&Systema_EL) == HAL_OK) {
+      Turning_on_the_engine(&Motor_EL, Systema_EL.Status.Angular > 0 ? Down : Up);
+      HAL_Delay(250);
+      Engine_shutdown(&Motor_EL);
+    };
   };
 };
 
