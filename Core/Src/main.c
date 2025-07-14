@@ -51,8 +51,14 @@ TIM_HandleTypeDef htim5;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+<<<<<<< HEAD
 float Angular_AZ_encoder;
 float Angular_EL_encoder;
+=======
+unsigned char UART_ready = 1;
+size_t Size_Rx_UART;
+size_t Size_Tx_UART;
+>>>>>>> fork/main
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,6 +86,22 @@ static void MX_TIM5_Init(void);
   */
 int main(void)
 {
+<<<<<<< HEAD
+=======
+
+  /* USER CODE BEGIN 1 */
+  Positional_encoder_AZ.Timer = &htim5;
+  Positional_encoder_EL.Timer = &htim4;
+
+  Motor_AZ.PWM.Timer = &htim3;
+  Motor_AZ.PWM.Channel = TIM_CHANNEL_1;
+  Motor_EL.PWM.Timer = &htim2;
+  Motor_EL.PWM.Channel = TIM_CHANNEL_1;
+
+  Target.Chanal = &huart2;
+  Size_Rx_UART = sizeof(Target.Rx_data);
+  Size_Tx_UART = sizeof(Target.Tx_data);
+>>>>>>> fork/main
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -108,15 +130,46 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
+<<<<<<< HEAD
   Encoders_Init(&htim5, &htim4);
+=======
+  Initialization_of_positioning_encoders();
+  HAL_UART_Receive_IT(Target.Chanal, (uint8_t*)Target.Rx_data, Size_Rx_UART);
+>>>>>>> fork/main
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+<<<<<<< HEAD
 
   while (1)
   {
 	  Angular_AZ_encoder = GetEncoderAngle(&Encoder_AZ ,&htim5);
+=======
+  while (1)
+  {
+    Reading_the_system_position(&Positional_encoder_AZ, &Systema_AZ);
+    Reading_the_system_position(&Positional_encoder_EL, &Systema_EL);
+
+    if (Checking_the_workspace(&Systema_AZ) == HAL_OK && Checking_the_workspace(&Systema_EL) == HAL_OK) {
+      switch (Target.Rx_data[15]) {
+      case '0':
+        Manual_operation();
+    	break;
+      case '1':
+    	Pointing_at_an_angle();
+        break;
+      case '2': break;
+      default:
+    	Message_formation();
+        if (HAL_UART_Transmit_IT(Target.Chanal, (uint8_t*)Target.Tx_data, Size_Tx_UART) == HAL_OK) {
+          Target.transmitting = 1;
+        };
+        break;
+      }
+    }
+    else {Return_to_the_workspace();};
+>>>>>>> fork/main
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -395,7 +448,7 @@ static void MX_TIM4_Init(void)
   htim4.Init.Period = 65535;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
@@ -444,7 +497,7 @@ static void MX_TIM5_Init(void)
   htim5.Init.Period = 4294967295;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
@@ -567,10 +620,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+<<<<<<< HEAD
+=======
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	Data_parsing();
+
+	HAL_UART_Receive_IT(&huart2, (uint8_t*)Target.Rx_data, Size_Rx_UART);
+};
+>>>>>>> fork/main
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    Target.transmitting = 0;  // Сброс флага после передачи
+    Target.transmitting = 0;
 }
 
 // Обработчик прерывания для азимута (TIM5)

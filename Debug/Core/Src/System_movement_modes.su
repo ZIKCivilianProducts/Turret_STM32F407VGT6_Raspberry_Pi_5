@@ -1,0 +1,2 @@
+../Core/Src/System_movement_modes.c:35:6:Manual_operation	8	static
+../Core/Src/System_movement_modes.c:74:6:Pointing_at_an_angle	16	static

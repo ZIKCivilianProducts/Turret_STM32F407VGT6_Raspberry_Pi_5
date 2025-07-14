@@ -1,6 +1,6 @@
-Core/Src/Analog_digital_converter.o: \
- ../Core/Src/Analog_digital_converter.c \
- ../Core/Inc/Analog_digital_converter.h ../Core/Inc/Motor_step_driver.h \
+Core/Src/Orientation_of_the_system.o: \
+ ../Core/Src/Orientation_of_the_system.c \
+ ../Core/Inc/Orientation_of_the_system.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -32,9 +32,8 @@ Core/Src/Analog_digital_converter.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/Engine_conditions.h ../Core/Inc/Binary_macros.h
-../Core/Inc/Analog_digital_converter.h:
-../Core/Inc/Motor_step_driver.h:
+ ../Core/Inc/Ternary_macros.h ../Core/Inc/Binary_macros.h
+../Core/Inc/Orientation_of_the_system.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
@@ -66,5 +65,5 @@ Core/Src/Analog_digital_converter.o: \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/Engine_conditions.h:
+../Core/Inc/Ternary_macros.h:
 ../Core/Inc/Binary_macros.h:

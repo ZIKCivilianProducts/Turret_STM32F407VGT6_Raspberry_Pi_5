@@ -30,7 +30,9 @@ Core/Src/Raspberry_Pi.o: ../Core/Src/Raspberry_Pi.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ ../Core/Inc/Orientation_of_the_system.h ../Core/Inc/Ternary_macros.h \
+ ../Core/Inc/Binary_macros.h
 ../Core/Inc/Raspberry_Pi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -63,3 +65,6 @@ Core/Src/Raspberry_Pi.o: ../Core/Src/Raspberry_Pi.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+../Core/Inc/Orientation_of_the_system.h:
+../Core/Inc/Ternary_macros.h:
+../Core/Inc/Binary_macros.h:

@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 "./Core/Src/Analog_digital_converter.o"
 "./Core/Src/Encoder.o"
 "./Core/Src/Motor_step_driver.o"
 "./Core/Src/Proportional_integral_differentiating_regulator.o"
+=======
+"./Core/Src/Encoder.o"
+"./Core/Src/Motor_step_driver.o"
+"./Core/Src/Orientation_of_the_system.o"
+>>>>>>> fork/main
 "./Core/Src/Raspberry_Pi.o"
-"./Core/Src/Transfer_to_Raspberry_Pi.o"
+"./Core/Src/System_movement_modes.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_it.o"

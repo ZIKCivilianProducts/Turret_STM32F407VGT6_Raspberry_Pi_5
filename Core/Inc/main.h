@@ -38,10 +38,15 @@ extern "C" {
 
 #include "Raspberry_Pi.h"
 #include "Motor_step_driver.h"
+<<<<<<< HEAD
 #include "Engine_conditions.h"
 #include "Analog_digital_converter.h"
 #include "Transfer_to_Raspberry_Pi.h"
 #include "Encoder.h"
+=======
+#include "Encoder.h"
+#include "System_movement_modes.h"
+>>>>>>> fork/main
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

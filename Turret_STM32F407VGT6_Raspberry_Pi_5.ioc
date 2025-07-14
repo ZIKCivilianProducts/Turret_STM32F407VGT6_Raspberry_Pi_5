@@ -78,7 +78,17 @@ NVIC.TIM4_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC.TIM5_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC.USART2_IRQn=true\:0\:0\:false\:false\:true\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
+<<<<<<< HEAD:Turret_STM32F407VGT6_Raspberry_Pi_5.ioc
 PA0-WKUP.Signal=S_TIM5_CH1
+=======
+PA0-WKUP.GPIOParameters=GPIO_PuPd,GPIO_Label
+PA0-WKUP.GPIO_Label=Encoder_AZ_A
+PA0-WKUP.GPIO_PuPd=GPIO_PULLUP
+PA0-WKUP.Signal=S_TIM5_CH1
+PA1.GPIOParameters=GPIO_PuPd,GPIO_Label
+PA1.GPIO_Label=Encoder_AZ_B
+PA1.GPIO_PuPd=GPIO_PULLUP
+>>>>>>> fork/main:Release.ioc
 PA1.Signal=S_TIM5_CH2
 PA5.GPIOParameters=GPIO_Label
 PA5.GPIO_Label=TIM_EL
@@ -87,11 +97,13 @@ PA5.Signal=S_TIM2_CH1_ETR
 PA6.GPIOParameters=GPIO_Label
 PA6.GPIO_Label=TIM_AZ
 PA6.Signal=S_TIM3_CH1
-PB6.GPIOParameters=GPIO_Label
+PB6.GPIOParameters=GPIO_PuPd,GPIO_Label
 PB6.GPIO_Label=Encoder_EL_A
+PB6.GPIO_PuPd=GPIO_PULLUP
 PB6.Signal=S_TIM4_CH1
-PB7.GPIOParameters=GPIO_Label
+PB7.GPIOParameters=GPIO_PuPd,GPIO_Label
 PB7.GPIO_Label=Encoder_EL_B
+PB7.GPIO_PuPd=GPIO_PULLUP
 PB7.Signal=S_TIM4_CH2
 PC0.GPIOParameters=GPIO_Label
 PC0.GPIO_Label=Trigger_position
@@ -173,6 +185,7 @@ PH1-OSC_OUT.Signal=RCC_OSC_OUT
 PinOutPanel.RotationAngle=0
 ProjectManager.AskForMigrate=true
 ProjectManager.BackupPrevious=false
+ProjectManager.CompilerLinker=GCC
 ProjectManager.CompilerOptimize=6
 ProjectManager.ComputerToolchain=false
 ProjectManager.CoupleFile=false
@@ -263,6 +276,7 @@ TIM3.IPParameters=Channel-PWM Generation1 CH1,AutoReloadPreload,Prescaler,Period
 TIM3.Period=999
 TIM3.Prescaler=1
 TIM3.Pulse-PWM\ Generation1\ CH1=500
+<<<<<<< HEAD:Turret_STM32F407VGT6_Raspberry_Pi_5.ioc
 TIM4.EncoderMode=TIM_ENCODERMODE_TI12
 TIM4.IC1Filter=0
 TIM4.IC2Filter=0
@@ -272,6 +286,14 @@ TIM5.IC1Filter=0
 TIM5.IC2Filter=0
 TIM5.IPParameters=Period,EncoderMode,IC1Filter,IC2Filter
 TIM5.Period=4294967295
+=======
+TIM4.IC1Filter=6
+TIM4.IC2Filter=6
+TIM4.IPParameters=IC1Filter,IC2Filter
+TIM5.IC1Filter=6
+TIM5.IC2Filter=6
+TIM5.IPParameters=IC1Filter,IC2Filter
+>>>>>>> fork/main:Release.ioc
 USART2.BaudRate=921600
 USART2.IPParameters=VirtualMode,BaudRate
 USART2.VirtualMode=VM_ASYNC

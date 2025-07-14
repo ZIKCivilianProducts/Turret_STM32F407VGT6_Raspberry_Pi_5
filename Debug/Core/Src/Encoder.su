@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 ../Core/Src/Encoder.c:48:6:Encoders_Init	16	static
 ../Core/Src/Encoder.c:81:7:GetEncoderAngle	24	static
+=======
+../Core/Src/Encoder.c:13:6:Initialization_of_positioning_encoders	16	static
+../Core/Src/Encoder.c:32:6:Reading_the_system_position	32	static
+>>>>>>> fork/main
