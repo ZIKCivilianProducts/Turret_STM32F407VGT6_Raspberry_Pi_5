@@ -36,6 +36,6 @@ extern Encoder Encoder_AZ;
 extern Encoder Encoder_EL;
 
 void Encoders_Init(TIM_HandleTypeDef *htim_az, TIM_HandleTypeDef *htim_el);
-float GetEncoderAngle(Encoder* enc, TIM_HandleTypeDef *htim_az, TIM_HandleTypeDef *htim_el);
+float GetEncoderAngle(Encoder* enc, TIM_HandleTypeDef *htim_az);
 
 #endif /* INC_ENCODER_H_ */

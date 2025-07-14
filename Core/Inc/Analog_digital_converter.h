@@ -14,7 +14,9 @@ typedef struct
 {
   ADC_HandleTypeDef *Convertor;
 
-  unsigned int Maximum_discrete_level, Middle_discrete_level, Minimum_discrete_level;
+  unsigned int Maximum_discrete_level;
+//  unsigned int Middle_discrete_level;
+  unsigned int Minimum_discrete_level;
   unsigned int Discrete_level;
 } Analog_digital_converter;
 

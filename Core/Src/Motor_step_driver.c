@@ -14,21 +14,21 @@ Motor Motor_AZ = {
       .ENA_port = GPIOE, .ENA_pin = GPIO_PIN_11
     },
     .PWM = {
-      .Maximum_frequency = 200000,
-      .Minimum_frequency = 20000,
-      .Increment_frequency = 10000
+      .Maximum_frequency = 50000,
+      .Minimum_frequency = 5000,
+      .Increment_frequency = 500
     },
     .Angular = {
       .Maximum_angular = 270.0f,
       .Minimum_angular = -270.0f,
-      .Deviation = 50.0f,
-      .Guidance_accuracy = 5.0f
+      .Deviation = 1.0f,
+      .Guidance_accuracy = 1.0f
     },
     .Alfa = 0.01f
   },
   .Status = {
     .Angular = 0.0f,
-    .Frequency = 5000,
+    .Frequency = 0,
     .Moving = 0
   }
 };
@@ -40,21 +40,21 @@ Motor Motor_EL = {
       .ENA_port = GPIOE, .ENA_pin = GPIO_PIN_12
     },
     .PWM = {
-      .Maximum_frequency = 200000,
-      .Minimum_frequency = 20000,
-      .Increment_frequency = 10000
+      .Maximum_frequency = 50000,
+      .Minimum_frequency = 5000,
+      .Increment_frequency = 500
     },
     .Angular = {
       .Maximum_angular = 90.0f,
       .Minimum_angular = -20.0f,
-      .Deviation = 10.0f,
-      .Guidance_accuracy = 5.0f
+      .Deviation = 1.0f,
+      .Guidance_accuracy = 1.0f
     },
     .Alfa = 0.01f
   },
   .Status = {
     .Angular = 0.0f,
-    .Frequency = 5000,
+    .Frequency = 0,
     .Moving = 0
   }
 };
